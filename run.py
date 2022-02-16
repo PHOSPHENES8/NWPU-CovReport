@@ -1,32 +1,42 @@
-from selenium import webdriver
-from send_email import send_email
-import time
+import imp
+from swm.Chrome import Chrome
+from classes.ReadInfoConf import ReadInfoConf
+from classes.SendEmail import SendEmail
+from classes.ReportingOfEpidemicSituation import ReportingOfEpidemicSituation
+import configparser
 
-# 打开chrome浏览器
-options = webdriver.ChromeOptions()
-options.add_experimental_option('excludeSwitches', ['enable-logging'])
-driver = webdriver.Chrome(options=options) 
-driver.maximize_window()
-url = r'http://yqtb.nwpu.edu.cn/wx/xg/yz-mobile/index.jsp'
-driver.get(url)
 
-# 登录信息
-username = driver.find_element_by_id('username')
-password = driver.find_element_by_id('password')
+if __name__ == "__main__":
+    # 读取配置
+    read_info_conf = ReadInfoConf(confpath="infoconf/conf.ini")
 
-stu_number = '学号'
-stu_password = '登陆密码'
-username.send_keys(stu_number)
-password.send_keys(stu_password)
+    stu_number = read_info_conf.get('info', 'stu_number')
+    stu_passwd = read_info_conf.get('info', 'stu_passwd')
+    url = read_info_conf.get('info', 'url')
 
-# 自动填报
-driver.find_element_by_name('submit').click()
-time.sleep(1)       # 暂停线程1s，防止部分页面跳转过慢导致运行失败
-driver.find_element_by_partial_link_text('每日填报').click()
-driver.find_element_by_partial_link_text('提交填报信息').click()
-time.sleep(1)
-driver.find_element_by_class_name('co3').click()
-driver.find_element_by_partial_link_text('确认提交').click()
-time.sleep(2)
-driver.close()
-send_email()
+    # 检查conf.ini中指定的chromedriver版本和chrome版本是否匹配，不匹配则重新下载并解压
+    chrome_webdriver_setup = Chrome("webdriverconf/conf.ini")
+
+    # 疫情填报
+    reportingOfEpidemicSituation = ReportingOfEpidemicSituation(
+        url=url, stu_number=stu_number, stu_passwd=stu_passwd)
+    reportingOfEpidemicSituation.run()
+
+    try:
+        from_addr = read_info_conf.get('163email', 'from_addr')
+        password = read_info_conf.get('163email', 'password')
+        to_addr = read_info_conf.get('163email', 'to_addr')
+        smtp_server = read_info_conf.get('163email', 'smtp_server')
+
+        # 发送邮件提醒
+        sendEmail = SendEmail(
+            from_addr=from_addr,
+            password=password,
+            to_addr=to_addr,
+            smtp_server=smtp_server)
+        header_content = "每日疫情填报情况"
+        content = "'已完成今日疫情填报表(づ￣ 3￣)づ'"
+        sendEmail.send_email(header_content=header_content,
+                             content=content)
+    except configparser.NoSectionError:
+        pass

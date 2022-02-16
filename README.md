@@ -7,7 +7,7 @@
     ```shell
     git clone git@github.com:PHOSPHENES8/NWPU-CovReport.git
     cd NWPU-CovReport
-    pip install requirements.txt
+    pip install -r requirements.txt
     ```
 2. 开启stmp服务：不同邮箱开启方式不同，可自行百度
    
@@ -63,7 +63,13 @@
     url=https://chromedriver.storage.googleapis.com
     ```
 
-4. 定时执行
+4. 打包
+
+* 因为使用到了本地的python类包，和相对路径有关，故需要打包。
+* pyinstaller -F run.py
+* 文件夹dist下就是可执行exe
+
+1. 定时执行
 
 - 通过控制面板→计划任务→创建基本任务→填写相应内容→完成
 - 增加任务指令

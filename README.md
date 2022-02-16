@@ -46,18 +46,14 @@
     > 添加一个section
     ```ini
     [driver]
-    # please input abs/relative path you chromedriver is.
-    # current path is directory where README.md is.
-    absPath=你希望把chromedriver存在哪里，可以写绝对路径，可以写相对路径，写相对路径的话，当前路径为该项目根目录。
+    absPath=你希望把chromedriver存在哪里，写绝对路径
     ; url=http://npm.taobao.org/mirrors/chromedriver
     url=https://chromedriver.storage.googleapis.com
     ```
     > 例如如下:
     ```ini
     [driver]
-    # please input abs/relative path you chromedriver is.
-    # current path is directory where README.md is.
-    absPath=chromedriver/chromedriver.exe
+    absPath=D:/Source/chromedriver/chromedriver.exe
     ; url=http://npm.taobao.org/mirrors/chromedriver
     url=https://chromedriver.storage.googleapis.com
     ```

@@ -2,7 +2,7 @@ from selenium import webdriver
 
 
 class ReportingOfEpidemicSituation():
-    def __init__(self, url, stu_number, stu_passwd) -> None:
+    def __init__(self, executable_path, url, stu_number, stu_passwd) -> None:
         self.url = url
         self.stu_number = stu_number
         self.stu_passwd = stu_passwd
@@ -11,8 +11,8 @@ class ReportingOfEpidemicSituation():
         self.options = webdriver.ChromeOptions()
         self.options.add_experimental_option(
             'excludeSwitches', ['enable-logging'])
-        self.options.add_argument('--headless')
-        self.driver = webdriver.Chrome(options=self.options)
+        # self.options.add_argument('--headless')
+        self.driver = webdriver.Chrome(options=self.options, executable_path = executable_path)
 
     def run(self):
         # self.driver.maximize_window()

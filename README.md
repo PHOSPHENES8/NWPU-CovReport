@@ -64,15 +64,9 @@
 * pyinstaller -F run.py
 * 文件夹dist下就是可执行exe
 
-1. 定时执行
+5. 定时执行
 
 - 通过控制面板→计划任务→创建基本任务→填写相应内容→完成
-- 增加任务指令
-  
-    ```shell
-    cd 当前项目目录
-    python run.py
-    ```
 
 ## Notes
 

@@ -5,7 +5,6 @@
 1. 安装所需依赖.
     
     ```shell
-    git clone git@github.com:PHOSPHENES8/NWPU-CovReport.git
     cd NWPU-CovReport
     pip install -r requirements.txt
     ```

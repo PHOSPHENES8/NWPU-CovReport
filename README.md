@@ -1,18 +1,79 @@
-### 西工大疫情填报
+# 西工大疫情填报
 
-#### 0. Setup
+## Setup
 
-- chrome驱动：[下载链接](https://liushilive.github.io/github_selenium_drivers/md/Chrome.html)（需要将解压后的exe文件放置到chrome安装文件夹中，本仓库中的exe文件对应chrome98版本）
-- Python库：selenium
-- 开启stmp服务：不同邮箱开启方式不同，可自行百度
+1. 安装所需依赖.
+    
+    ```shell
+    git clone git@github.com:PHOSPHENES8/NWPU-CovReport.git
+    cd NWPU-CovReport
+    pip install requirements.txt
+    ```
+2. 开启stmp服务：不同邮箱开启方式不同，可自行百度
+   
+3. 修改配置文件
+   
+   配置文件有两个.
+   
+   一个是放在`infoconf`文件夹下的conf.ini文件：
+   > 添加两个section
+    ```ini
+    [info]
+    stu_number=你的翱翔门户学号
+    stu_passwd=你的翱翔门户密码
+    url = http://yqtb.nwpu.edu.cn/wx/xg/yz-mobile/index.jsp
+    
+    [163email]
+    from_addr = 你的163邮箱
+    password  = 你的163 smtp/pop3 密码
+    to_addr = 你要给哪个邮箱发邮件
+    smtp_server = smtp.163.com
+    ```
+    > 例如改成如下:
+    ```ini
+    [info]
+    stu_number=8888888888
+    stu_passwd=cym8888888
+    url = http://yqtb.nwpu.edu.cn/wx/xg/yz-mobile/index.jsp
 
-#### 1. Execute
+    [163email]
+    from_addr = 8888888888@163.com
+    password  = TSAAUDYNABCDEFGH
+    to_addr = 8888888888@foxmail.com
+    smtp_server = smtp.163.com
+    ```
 
-- 自动疫情填报执行：`python run.py`
-- 取消发送邮件提醒：去掉最后一行注释`send_email()`
+    一个是放在`webdriverconf`文件夹下的conf.ini文件：
+    > 添加一个section
+    ```ini
+    [driver]
+    # please input abs/relative path you chromedriver is.
+    # current path is directory where README.md is.
+    absPath=你希望把chromedriver存在哪里，可以写绝对路径，可以写相对路径，写相对路径的话，当前路径为该项目根目录。
+    ; url=http://npm.taobao.org/mirrors/chromedriver
+    url=https://chromedriver.storage.googleapis.com
+    ```
+    > 例如如下:
+    ```ini
+    [driver]
+    # please input abs/relative path you chromedriver is.
+    # current path is directory where README.md is.
+    absPath=chromedriver/chromedriver.exe
+    ; url=http://npm.taobao.org/mirrors/chromedriver
+    url=https://chromedriver.storage.googleapis.com
+    ```
+
+4. 定时执行
+
 - 通过控制面板→计划任务→创建基本任务→填写相应内容→完成
+- 增加任务指令
+  
+    ```shell
+    cd 当前项目目录
+    python run.py
+    ```
 
-#### 2. Notes
+## Notes
 
 - 因为西工大会自动记录上一天的信息，所以不需要填报其他信息可直接提交；
 
@@ -34,6 +95,7 @@
   driver.find_element_by_xpath('//*[@id="rbxx_div"]/div[10]/label[1]').click()
   ```
 
-#### 3. Reference
+## Reference
 
 - https://www.freesion.com/article/6211985604/
+- [检测注册表去比对chromedriver版本和chrome版本是否符合](https://gitee.com/z417/selenium-webdriver-manager)

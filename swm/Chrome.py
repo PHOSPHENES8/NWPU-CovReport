@@ -40,6 +40,7 @@ class Chrome(Manager):
         print('check Chrome and chromedriver wheather are matched')
         c_v = super().browser_version(Browser_type.GOOGLE)
         d_v = self.chromedriver_version()
+        print(f'current chrome Version: \033[0;33;40m{c_v}\033[0m')
         if c_v == d_v:
             print('\033[0;32;40mChrome and chromedriver are matched.\033[0m')
         else:
@@ -63,12 +64,15 @@ class Chrome(Manager):
         else:
             rep = urllib.request.urlopen(self.url).read().decode('utf-8')
             root = ElementTree.fromstring(rep)
+            # print(root)
             xmlns = '{http://doc.s3.amazonaws.com/2006-03-01}'
             for child in root.findall(xmlns + 'Contents'):
                 key = child.find(xmlns + 'Key').text
                 if __v in key and 'chromedriver' in key:
                     if ot in key:
                         match_list.append(key)
+            if not match_list:
+                print("chromedriver match chrome version {} not found, please download it manually and put it at your specific path.".format(__v))
             driver_name = match_list[-1]
             down_uri = urllib.parse.urljoin(self.url, driver_name)
         if not os.path.exists(save_d):

@@ -41,7 +41,10 @@ class Chrome(Manager):
         c_v = super().browser_version(Browser_type.GOOGLE)
         d_v = self.chromedriver_version()
         print(f'current chrome Version: \033[0;33;40m{c_v}\033[0m')
-        if c_v == d_v:
+        c_vs = c_v.split('.')
+        d_vs = d_v.split('.')
+        if c_vs[0] == d_vs[0] and c_vs[1] == d_vs[1]:
+        # if c_v == d_v:
             print('\033[0;32;40mChrome and chromedriver are matched.\033[0m')
         else:
             save_d = os.path.dirname(self.absPath)

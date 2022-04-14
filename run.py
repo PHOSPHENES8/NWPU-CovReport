@@ -1,32 +1,112 @@
-from selenium import webdriver
-from send_email import send_email
-import time
+from swm.Chrome import Chrome
+from classes.ReadInfoConf import ReadInfoConf
+from classes.SendEmail import SendEmail
+from classes.ReportingOfEpidemicSituation import ReportingOfEpidemicSituation
+import configparser
+import os
+import platform
 
-# 打开chrome浏览器
-options = webdriver.ChromeOptions()
-options.add_experimental_option('excludeSwitches', ['enable-logging'])
-driver = webdriver.Chrome(options=options) 
-driver.maximize_window()
-url = r'http://yqtb.nwpu.edu.cn/wx/xg/yz-mobile/index.jsp'
-driver.get(url)
+if __name__ == "__main__":
+    # 读取配置
+    cur_os = "Windows"
+    if(platform.system()=='Windows'):
+        cur_os = "Windows"
+        try:
+            cur_home_dir = "C:" + os.environ["HOMEPATH"]
+        except KeyError as e:
+            print(e)
+            exit('找不到os.environ["HOMEPATH"]')
+    elif(platform.system()=='Linux'):
+        cur_os = "Linux"
+        try:
+            cur_home_dir = os.environ["HOME"]
+        except KeyError as e:
+            print(e)
+            exit('找不到os.environ["HOME"]')
+    else:
+        cur_os = "Linux"
+        try:
+            cur_home_dir = os.environ["HOME"]
+        except KeyError as e:
+            print(e)
+            exit('找不到os.environ["HOME"]')
 
-# 登录信息
-username = driver.find_element_by_id('username')
-password = driver.find_element_by_id('password')
+    cur_home_dir = os.path.abspath(cur_home_dir) 
+    print("当前配置文件所在文件夹为: {}.".format(cur_home_dir))
 
-stu_number = '学号'
-stu_password = '登陆密码'
-username.send_keys(stu_number)
-password.send_keys(stu_password)
+    studentinfoconf_dir = os.path.abspath(os.path.join(cur_home_dir, ".studentinfoconf"))
+    webdriverconf_dir = os.path.abspath(os.path.join(cur_home_dir, ".webdriverconf"))
 
-# 自动填报
-driver.find_element_by_name('submit').click()
-time.sleep(1)       # 暂停线程1s，防止部分页面跳转过慢导致运行失败
-driver.find_element_by_partial_link_text('每日填报').click()
-driver.find_element_by_partial_link_text('提交填报信息').click()
-time.sleep(1)
-driver.find_element_by_class_name('co3').click()
-driver.find_element_by_partial_link_text('确认提交').click()
-time.sleep(2)
-driver.close()
-send_email()
+    file_name = os.path.join(studentinfoconf_dir, "conf.ini")
+    if not os.path.exists(file_name):
+        if not os.path.exists(studentinfoconf_dir):
+            os.mkdir(studentinfoconf_dir)
+        with open(file_name,'w',encoding='utf-8'):
+            pass
+        print("请先在您的家目录下创建 .infoconf/conf.ini 文件并正确配置")
+        exit(1)
+    
+    file_name = os.path.join(webdriverconf_dir, "conf.ini")
+    if not os.path.exists(file_name):
+        if not os.path.exists(webdriverconf_dir):
+            os.mkdir(webdriverconf_dir)
+        with open(file_name,'w',encoding='utf-8'):
+            pass
+        print("请先在您的家目录下创建 .webdriverconf/conf.ini 文件并正确配置")
+        exit(1)
+    
+    infoconf_path = os.path.abspath(os.path.join(studentinfoconf_dir, "conf.ini"))
+    webdriverconf_path = os.path.abspath(os.path.join(webdriverconf_dir, "conf.ini"))
+    
+    # read_info_conf = ReadInfoConf(confpath="infoconf/conf.ini")
+    read_info_conf = ReadInfoConf(confpath=infoconf_path)
+
+    try:
+        stu_number = read_info_conf.get('info', 'stu_number')
+        stu_passwd = read_info_conf.get('info', 'stu_passwd')
+        url = read_info_conf.get('info', 'url')
+    except configparser.NoSectionError:
+        print("请先在您的家目录下创建 .webdriverconf/conf.ini 文件并正确配置")
+        exit(1)
+
+    # 检查conf.ini中指定的chromedriver版本和chrome版本是否匹配，不匹配则重新下载并解压
+    # chrome_webdriver_setup = Chrome("webdriverconf/conf.ini")
+    if cur_os == "Windows":
+        chrome_webdriver_setup = Chrome(webdriverconf_path)
+    elif cur_os == "Linux":
+        chrome_webdriver_setup = Chrome(webdriverconf_path)
+        pass
+    else:
+        chrome_webdriver_setup = Chrome(webdriverconf_path)
+        pass
+
+    read_info_conf_webdriver = ReadInfoConf(confpath=webdriverconf_path)
+    try:
+        executable_path = read_info_conf_webdriver.get('driver', 'absPath')
+    except configparser.NoSectionError:
+        print("请先在您的家目录下创建 .webdriverconf/conf.ini 文件并正确配置")
+        exit(1)
+
+    # 疫情填报
+    reportingOfEpidemicSituation = ReportingOfEpidemicSituation(
+        executable_path = executable_path, url=url, stu_number=stu_number, stu_passwd=stu_passwd)
+    reportingOfEpidemicSituation.run()
+
+    try:
+        from_addr = read_info_conf.get('163email', 'from_addr')
+        password = read_info_conf.get('163email', 'password')
+        to_addr = read_info_conf.get('163email', 'to_addr')
+        smtp_server = read_info_conf.get('163email', 'smtp_server')
+
+        # 发送邮件提醒
+        sendEmail = SendEmail(
+            from_addr=from_addr,
+            password=password,
+            to_addr=to_addr,
+            smtp_server=smtp_server)
+        header_content = "每日疫情填报情况"
+        content = "'已完成今日疫情填报表(づ￣ 3￣)づ'"
+        sendEmail.send_email(header_content=header_content,
+                             content=content)
+    except configparser.NoSectionError:
+        pass

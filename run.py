@@ -66,7 +66,7 @@ if __name__ == "__main__":
         stu_passwd = read_info_conf.get('info', 'stu_passwd')
         url = read_info_conf.get('info', 'url')
     except configparser.NoSectionError:
-        print("请先在您的家目录下创建 .webdriverconf/conf.ini 文件并正确配置")
+        print("请先在您的家目录下创建 .infoconf/conf.ini 文件并正确配置")
         exit(1)
 
     # 检查conf.ini中指定的chromedriver版本和chrome版本是否匹配，不匹配则重新下载并解压

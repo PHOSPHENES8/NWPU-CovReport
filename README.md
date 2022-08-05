@@ -83,7 +83,7 @@
 
     修改配置文件, 配置文件有两个.
       
-    一个是放在`/home/您的用户名称/.infoconf/`文件夹下的`conf.ini`文件(没有自行创建)：
+    一个是放在`/home/您的用户名称/.studentinfoconf/`文件夹下的`conf.ini`文件(没有自行创建)：
 
     > 添加两个section
     ```ini
